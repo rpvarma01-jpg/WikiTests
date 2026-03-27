@@ -12,11 +12,11 @@ class wikitool:
         self.header = {
         "User-Agent": 'SchoolProject-COMPSCI/1.0 (High School Project; Fairveiw High School; mailto: rpvarma01@bvsd.org)'
         }
-        self.articles = [];
-        self.choice_index = 0;
-        self.title = "";
-        self.article_chosen = False;
-        self.fullText = "";
+        self.articles = []
+        self.choice_index = 0
+        self.title = ""
+        self.article_chosen = False
+        self.fullText = ""
          
     def wiki_search(self, search):
         params_search = {
@@ -32,24 +32,24 @@ class wikitool:
         data  = response.json()
 
         titles = [item["title"] for item in data["query"]["search"]]
-        self.articles = titles;
-        return self.articles;
+        self.articles = titles
+        return self.articles
 
 
     def wiki_choose(self, choice):
         if (self.articles == []):
             return "error no loaded article"
         else:
-            self.choice_index = choice;
-            self.article_chosen = True;
-            self.title = self.articles[self.choice_index];
+            self.choice_index = choice
+            self.article_chosen = True
+            self.title = self.articles[self.choice_index]
 
     def wiki_load_text_without_header(self):
         if (self.article_chosen != True):
             return "error no chosen article to be loaded from article list"
         
         
-        title = self.title;
+        title = self.title
         params_load = {
             "action": "query",
             "titles": title,
@@ -66,14 +66,30 @@ class wikitool:
         pages = data["query"]["pages"]
         page_id = list(pages.keys())[0] 
         full_text = pages[page_id]["extract"]
-        self.fullText = full_text;
-        return self.fullText;
+        self.fullText = full_text
+        return self.fullText
         
-    
+    def wiki_load_articles_header(self):
+        if self.article_chosen  != True:
+            return "error no chosen article to be loaded from article list"
+        
+        title = self.title
+        
+        params_header = {
+            "action":"parse",
+            "page": title,
+            "prop": "sections",
+            "format":"json"
+        }
+        response = requests.get(URL, headers = self.header, params = params_header)
+        response.raise_for_status()
+        data = response.json()
+        sections = data["parse"]["sections"]
+        headers = [section["line"] for section in sections]
+        return headers
+       
 bot = wikitool()
-bot.wiki_search("Mars")
-bot.wiki_choose(0)
-print(bot.wiki_load_text_without_header())
+
 
 
 
