@@ -17,7 +17,7 @@ class wikitool:
         self.title = ""
         self.article_chosen = False
         self.fullText = ""
-         
+        self.headersOfArticle = [];
     def wiki_search(self, search):
         params_search = {
             "action": "query",
@@ -86,9 +86,45 @@ class wikitool:
         data = response.json()
         sections = data["parse"]["sections"]
         headers = [section["line"] for section in sections]
-        return headers
-       
+        self.headersOfArticle = headers
+        return self.headersOfArticle
+    
+    def wiki_load_section_text(self, section_index): ##returns but as raw html text, not plain text, need to be fixed.
+        if self.article_chosen != True:
+            return "error no chosen article to be loaded from article list"
+        
+        title = self.title
+        params_section = {
+            "action":"parse",
+            "page": title,
+            "prop": "text",
+            "section": section_index,   
+            "format":"json"
+        }
+        response = requests.get(URL, headers = self.header, params = params_section)
+        response.raise_for_status()
+        data = response.json()
+        section_text = data["parse"]["text"]["*"]
+        return section_text
+
+ 
+    
+def pretty_print(text, limit): ## only works for stuff that gets returned as a list, like the article headers and the search results
+    if (limit == "max"):
+        limit = len(text)
+            
+    for i in range(0, limit):
+        print(text[i])
+        
+    print("\n")
+
+
 bot = wikitool()
+pretty_print(bot.wiki_search("Monkey"), 10)
+
+bot.wiki_choose(0)
+
+pretty_print(bot.wiki_load_articles_header(), "max")
 
 
 
