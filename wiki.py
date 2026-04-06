@@ -42,13 +42,25 @@ class wikitool: ############IMPORTANT BUG!! NOTES, REFRENCES, OR EXTERNAL LINKS 
         return self.articles
 
 
-    def wiki_choose(self, choice):
+    def wiki_choose_index(self, choice):
         if (self.articles == []):
             return "error no loaded article"
         else:
             self.choice_index = choice
             self.article_chosen = True
             self.title = self.articles[self.choice_index]
+
+    def wiki_choose(self, name):
+        if (self.articles == []):
+            return "error no loaded article"
+        else:
+            for i in range(len(self.articles)):
+                if self.articles[i].lower() == name.lower():
+                    self.choice_index = i
+                    self.article_chosen = True
+                    self.title = self.articles[self.choice_index]
+                    return
+            return "error no article with that name found in article list"
 
     def wiki_load_text_without_header(self):
         if (self.article_chosen != True):
@@ -79,6 +91,9 @@ class wikitool: ############IMPORTANT BUG!! NOTES, REFRENCES, OR EXTERNAL LINKS 
         if self.article_chosen  != True:
             return "error no chosen article to be loaded from article list"
         
+        if type(self.title) == int:
+            return "error title of article must be a string"
+        
         title = self.title
         
         params_header = {
@@ -108,6 +123,18 @@ class wikitool: ############IMPORTANT BUG!! NOTES, REFRENCES, OR EXTERNAL LINKS 
     def wiki_load_section_text(self, section_index): ##returns text. but, sometimes can return text off to the side in like a table and insert it into the text. I have tried to remove this but it is not perfect. I have also tried to remove the references but sometimes they are still there. I have also tried to remove the edit section but sometimes it is still there. I have also tried to remove the navbox but sometimes it is still there. I have also tried to remove the infobox but sometimes it is still there. I have also tried to remove the thumb but sometimes it is still there. I have also tried to remove the extiw but sometimes it is still there. I have also tried to remove the reference but sometimes it is still there. I have also tried to remove the table but sometimes it is still there.
         if self.article_chosen != True:
             return "error no chosen article to be loaded from article list"
+        
+        if section_index == "error no section with that name found in article headers":
+            return "error no section with that name found in article headers"
+        
+        if type(section_index) != int:
+            return "error section index must be an integer"
+        
+        
+        if section_index < 1 or section_index > len(self.headersOfArticle):
+            return "error section index out of range of loaded headers of article"
+        
+        
         
         title = self.title
         params_section = {
@@ -143,6 +170,7 @@ class wikitool: ############IMPORTANT BUG!! NOTES, REFRENCES, OR EXTERNAL LINKS 
         return readable_data
 
     def wiki_get_section_index_by_name(self, section_name):
+
         if self.article_chosen != True:
             return "error no chosen article to be loaded from article list"
         
@@ -176,15 +204,20 @@ if __name__ == "__main__":
     
     pretty_print(bot.wiki_search("monkey"), 10)
 
-    title = input("Enter the index of the article you want to load: ")
+    title = input("Enter the title of the article you want to load: ")
 
-    bot.wiki_choose(int(title))
+    bot.wiki_choose(title)
 
     bot.wiki_load_articles_header()
 
-    section_index = bot.wiki_get_section_index_by_name("Notes")
-    print(section_index)
-    print(bot.wiki_load_section_text(section_index))
+
+    pretty_print(bot.headersOfArticle, "max")
+    
+    section_name = bot.wiki_get_section_index_by_name(input("Enter the name of the section you want to load: "))
+    
+    print(bot.wiki_load_section_text(section_name))
+
+    
 
 
 

@@ -78,7 +78,7 @@ class WikiGUI:
     def search(self):
         query = self.search_entry.get()
         self.status_label.config(text=f"Searched for: {query}")
-
+        
 
         # hook your wikitool here
         # results = bot.wiki_search(query)
